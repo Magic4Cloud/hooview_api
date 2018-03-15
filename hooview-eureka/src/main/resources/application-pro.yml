@@ -1,0 +1,6 @@
+security:
+  basic:
+    enabled: true #开启认证
+  user:
+    name: hooview #用户名
+    password: hooview123 #密码

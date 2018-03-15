@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.hooview.api.dao.AgreementDao">
+
+	<!-- 可根据自己的需求，是否要使用 -->
+    <resultMap type="com.hooview.api.entity.AgreementEntity" id="agreementMap">
+        <result property="userAgreement" column="user_agreement"/>
+        <result property="anchorAgreement" column="anchor_agreement"/>
+    </resultMap>
+
+	<select id="queryUserAgreement" resultType="com.hooview.api.entity.AgreementEntity">
+		select user_agreement from tb_agreement
+	</select>
+	<select id="queryAnchorAgreement" resultType="com.hooview.api.entity.AgreementEntity">
+		select anchor_agreement from tb_agreement
+	</select>
+	 
+	<update id="update" parameterType="com.hooview.api.entity.AgreementEntity">
+		update tb_agreement 
+		<set>
+			<if test="anchorAgreement != null">`anchor_agreement` = #{anchorAgreement}</if>
+			<if test="userAgreement != null">`user_agreement` = #{userAgreement}</if>
+		</set>
+	</update>
+	
+
+
+</mapper>

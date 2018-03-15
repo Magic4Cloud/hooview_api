@@ -1,0 +1,29 @@
+server:
+  port: 8670
+spring:
+  profiles:
+    active: dev
+  application:
+    name: hooview-zuul
+  # jackson时间格式化
+  jackson:
+    time-zone: GMT+8
+    date-format: yyyy-MM-dd HH:mm:ss
+  http:
+    multipart:
+      max-file-size: 100MB
+      max-request-size: 100MB
+      enabled: true
+zuul:
+  routes:
+    api:
+      path: / #所有api请求转发到hooview-service
+      serviceId: hooview-service
+hystrix:
+  command:
+      default:
+        execution:
+          isolation:
+            thread:
+              timeoutInMilliseconds: 5000 #服务调用超时时间5秒
+

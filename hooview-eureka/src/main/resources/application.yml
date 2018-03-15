@@ -1,0 +1,16 @@
+server:
+  port: 8660
+
+eureka:
+  instance:
+    hostname: peer1
+  client:
+    registerWithEureka: false # 表示为server
+    fetchRegistry: false # 表示为server
+    serviceUrl:
+      defaultZone: http://hooview:hooview123@peer2:8661/eureka/
+
+spring:
+    # 环境 dev|pro
+    profiles:
+      active: dev

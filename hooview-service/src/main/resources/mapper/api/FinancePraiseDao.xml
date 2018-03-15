@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.hooview.api.dao.FinancePraiseDao">
+
+	<!-- 可根据自己的需求，是否要使用 -->
+    <resultMap type="com.hooview.api.entity.FinanceInfoEntity" id="financeInfoMap">
+        <result property="financeInfoId" column="finance_info_id"/>
+        <result property="userId" column="user_id"/>
+    </resultMap>
+
+	<select id="queryPraise" resultType="com.hooview.api.entity.FinancePraiseEntity">
+		select * from tb_finance_praise where finance_info_id = #{financeInfoId} AND  user_id = #{userId}
+	</select>
+	<insert id="save" parameterType="com.hooview.api.entity.FinancePraiseEntity" useGeneratedKeys="true">
+		insert into tb_finance_praise
+		(
+			`finance_info_id`,
+			`user_id`
+		)
+		values
+		(
+			#{financeInfoId},
+			#{userId}
+		)
+	</insert>
+	
+	<delete id="deletePraise">
+		delete from tb_finance_praise where finance_info_id = #{financeInfoId}  AND  user_id = #{userId}
+	</delete>
+
+
+</mapper>

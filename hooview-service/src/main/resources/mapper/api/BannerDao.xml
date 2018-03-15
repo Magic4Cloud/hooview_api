@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.hooview.api.dao.BannerDao">
+
+	<!-- 可根据自己的需求，是否要使用 -->
+    <resultMap type="com.hooview.api.entity.BannerEntity" id="bannerMap">
+        <result property="bannerId" column="banner_id"/>
+        <result property="bannerUrl" column="banner_url"/>
+        <result property="bannerTitle" column="banner_title"/>
+        <result property="createTime" column="create_time"/>
+        <result property="picUrl" column="pic_url"/>
+    </resultMap>
+
+	<select id="queryObject" resultType="com.hooview.api.entity.BannerEntity">
+		select * from tb_banner where id = #{value}
+	</select>
+
+	<select id="queryList" resultType="com.hooview.api.entity.BannerEntity">
+		select * from tb_banner WHERE display = 1 order by `order` ,create_time desc limit 5
+	</select>
+
+	<select id="queryAdminList" resultType="com.hooview.api.dto.BannerDTO">
+		select * from tb_banner order by create_time desc
+	</select>
+	
+ 	<select id="queryTotal" resultType="int">
+		select count(*) from tb_banner 
+	</select>
+	 
+	<insert id="save" parameterType="com.hooview.api.entity.BannerEntity" useGeneratedKeys="true" keyProperty="id">
+		insert into tb_banner
+		(
+			`banner_url`,
+			`banner_title`,
+			`create_time`, 
+			`pic_url`
+		)
+		values
+		(
+			#{bannerUrl},
+			#{bannerTitle},
+			#{createTime}, 
+			#{picUrl}
+		)
+	</insert>
+
+	<insert id="saveOrUpdate" parameterType="com.hooview.api.dto.BannerDTO" useGeneratedKeys="true" keyProperty="id">
+
+
+			insert into tb_banner
+		(
+		`banner_url`,
+		`banner_title`,
+		`create_time`,
+		`pic_url`
+		)
+		values
+		(
+		#{bannerUrl},
+		#{bannerTitle},
+		now(),
+		 #{picUrl}
+
+		)
+		ON DUPLICATE KEY UPDATE
+		`banner_url`=#{bannerUrl},
+		`banner_title`=#{bannerTitle},
+		`create_time`=now(),
+		`pic_url`=#{picUrl}
+
+	</insert>
+
+	 
+	<update id="update" parameterType="com.hooview.api.entity.BannerEntity">
+		update tb_banner 
+		<set>
+			<if test="bannerUrl != null">`banner_url` = #{bannerUrl}, </if>
+			<if test="bannerTitle != null">`banner_title` = #{bannerTitle}, </if>
+			<if test="createTime != null">`create_time` = #{createTime}, </if>
+			<if test="picUrl != null">`pic_url` = #{picUrl}</if>
+		</set>
+		where banner_id = #{bannerId}
+	</update>
+
+	<update id="bannerOrder" parameterType="com.hooview.api.dto.BannerDTO">
+		update tb_banner
+		<set>
+			<if test="order != null">`order` = #{order}, </if>
+			<if test="display != null">`display` = #{display}</if>
+		</set>
+		where banner_id = #{bannerId}
+	</update>
+
+
+	
+	<delete id="delete">
+		delete from tb_banner where banner_id = #{value}
+	</delete>
+	
+	<delete id="deleteBatch">
+		delete from tb_banner where banner_id in
+		<foreach item="bannerId" collection="bannerIds" open="(" separator="," close=")">
+			#{bannerId}
+		</foreach>
+	</delete>
+
+</mapper>

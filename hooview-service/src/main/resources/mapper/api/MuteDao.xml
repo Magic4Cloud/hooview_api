@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.hooview.api.dao.MuteDao">
+
+    <!-- 可根据自己的需求，是否要使用 -->
+    <resultMap type="com.hooview.api.entity.MuteEntity" id="muteMap">
+        <result property="id" column="id"/>
+        <result property="chatroomId" column="chatroom_id"/>
+        <result property="userName" column="user_name"/>
+    </resultMap>
+
+    <select id="queryObject" resultType="com.hooview.api.entity.MuteEntity">
+        select * from tb_mute where id = #{value}
+    </select>
+
+    <select id="queryList" resultType="com.hooview.api.entity.MuteEntity">
+        select * from tb_mute
+        <choose>
+            <when test="sidx != null and sidx.trim() != ''">
+                order by ${sidx} ${order}
+            </when>
+            <otherwise>
+                order by id desc
+            </otherwise>
+        </choose>
+        <if test="offset != null and limit != null">
+            limit #{offset}, #{limit}
+        </if>
+    </select>
+
+    <select id="queryMuteList" resultType="com.hooview.api.entity.MuteEntity">
+        select * from tb_mute WHERE chatroom_id=#{chatroomId} AND user_name = #{userName}
+    </select>
+
+    <select id="queryTotal" resultType="int">
+        select count(*) from tb_mute
+    </select>
+
+    <insert id="save" parameterType="com.hooview.api.entity.MuteEntity" useGeneratedKeys="true" keyProperty="id">
+        insert into tb_mute
+        (
+        `chatroom_id`,
+        `user_name`
+        )
+        values
+        (
+        #{chatroomId},
+        #{userName}
+        )
+    </insert>
+
+    <update id="update" parameterType="com.hooview.api.entity.MuteEntity">
+        update tb_mute
+        <set>
+            <if test="chatroomId != null">`chatroom_id` = #{chatroomId}, </if>
+            <if test="userName != null">`user_name` = #{userName}</if>
+        </set>
+        where id = #{id}
+    </update>
+
+    <delete id="delete">
+        delete from tb_mute where chatroom_id = #{chatRoomId}
+    </delete>
+
+    <delete id="deleteBatch">
+        delete from tb_mute where id in
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+
+    <insert id="saveBatch" parameterType="com.hooview.api.dto.MuteCharMembers" useGeneratedKeys="true" keyProperty="id">
+        insert into tb_mute
+        (
+        `chatroom_id`,
+        `user_name`
+        )
+        values
+        <foreach collection="usernames" item="name" index="index" separator="," >
+            (#{roomId},#{name})
+        </foreach>
+    </insert>
+
+</mapper>

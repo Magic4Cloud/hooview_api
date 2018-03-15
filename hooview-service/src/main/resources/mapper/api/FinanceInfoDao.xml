@@ -1,0 +1,250 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.hooview.api.dao.FinanceInfoDao">
+
+	<!-- 可根据自己的需求，是否要使用 -->
+    <resultMap type="com.hooview.api.entity.FinanceInfoEntity" id="financeInfoMap">
+        <result property="financeInfoId" column="finance_info_id"/>
+        <result property="title" column="title"/>
+        <result property="content" column="content"/>
+        <result property="coverPic" column="cover_pic"/>
+        <result property="keyword" column="keyword"/>
+        <result property="status" column="status"/>
+        <result property="type" column="type"/>
+        <result property="sourceUrl" column="source_url"/>
+        <result property="banner" column="banner"/>
+        <result property="praiseNum" column="praise_num"/>
+        <result property="createUserId" column="create_user_id"/>
+        <result property="createTime" column="create_time"/>
+    </resultMap>
+
+	<select id="queryObject" resultType="com.hooview.api.entity.FinanceInfoEntity">
+		select * from tb_finance_info where finance_info_id = #{value}
+	</select>
+
+	<select id="queryAdminFinanceInfo" resultType="com.hooview.api.dto.AdminFinanceInfoDTO">
+	SELECT
+	fi.finance_info_id,
+	fi.title,
+	fi.summary,
+	fi.content,
+	fi.cover_pic,
+	fi.source_url,
+	fi.keyword,
+	fi.`status`,
+	fi.type,
+	fi.praise_num,
+	fi.head_url,
+	fi.agency_id agencyId,
+	u.username createUserName,
+	DATE_FORMAT(
+		fi.create_time,
+		'%Y-%m-%d %H:%i:%S'
+	) AS create_time
+FROM
+	tb_finance_info fi
+LEFT JOIN sys_user u ON fi.create_user_id = u.user_id
+	  WHERE finance_info_id = #{value}
+	</select>
+
+	<select id="queryList" resultType="com.hooview.api.dto.FinanceDTO">
+		SELECT fi.finance_info_id,fi.title,fi.content,fi.cover_pic,u.nickname,
+		u.head_url,u.introduce,DATE_FORMAT(fi.create_time,'%Y-%m-%d %H:%i:%S') as create_time
+		FROM tb_finance_info fi LEFT JOIN sys_user u ON fi.create_user_id=u.user_id
+		WHERE 1=1
+		<if test="keyword != null and keyword.trim() != ''">
+			AND fi.keyword LIKE CONCAT('%',#{keyword},'%')
+		</if>
+        <choose>
+            <when test="sidx != null and sidx.trim() != ''">
+                order by ${sidx} ${order}
+            </when>
+			<otherwise>
+                order by fi.finance_info_id desc
+			</otherwise>
+        </choose>
+		<if test="offset != null and limit != null">
+			limit #{offset}, #{limit}
+		</if>
+	</select>
+
+	<select id="queryAdminList" resultType="com.hooview.api.dto.AdminFinanceDTO">
+		SELECT
+		fi.finance_info_id,
+		fi.title,
+		fi.keyword,
+		fi.`status`,
+		fi.type,
+		fi.praise_num,
+		u.username createUserName,
+		DATE_FORMAT(
+		fi.create_time,
+		'%Y-%m-%d %H:%i:%S'
+		) AS create_time
+		FROM
+		tb_finance_info fi
+		LEFT JOIN sys_user u ON fi.create_user_id = u.user_id
+		WHERE
+		1 = 1
+		<if test="keyword != null and keyword.trim() != ''">
+			AND fi.keyword LIKE CONCAT('%',#{keyword},'%')
+		</if>
+		<if test="type != null and type.trim() != ''">
+			AND fi.type = #{type}
+		</if>
+		<choose>
+			<when test="sidx != null and sidx.trim() != ''">
+				order by ${sidx} ${order}
+			</when>
+			<otherwise>
+				order by fi.finance_info_id desc
+			</otherwise>
+		</choose>
+		<if test="offset != null and limit != null">
+			limit #{offset}, #{limit}
+		</if>
+	</select>
+
+	<select id="queryAdminTotal" resultType="int">
+		select count(*) from FROM
+		tb_finance_info fi
+		LEFT JOIN sys_user u ON fi.create_user_id = u.user_id
+		WHERE
+		1 = 1
+		<if test="keyword != null and keyword.trim() != ''">
+			AND fi.keyword LIKE CONCAT('%',#{keyword},'%')
+		</if>
+		<if test="type != null and type.trim() != ''">
+			AND fi.type = #{type}
+		</if>
+	</select>
+	
+ 	<select id="queryTotal" resultType="int">
+		select count(*) from tb_finance_info WHERE 1=1
+		<if test="keyword != null and keyword.trim() != ''">
+			AND keyword LIKE CONCAT('%',#{keyword},'%')
+		</if>
+	</select>
+
+	<select id="queryFinanceList" resultType="com.hooview.api.dto.FinanceDTO">
+		SELECT fi.finance_info_id,fi.title,fi.summary,fi.content,fi.cover_pic,
+		fi.head_url,
+		IFNULL(agency.agency_name,"") nickname,
+		DATE_FORMAT(fi.create_time,'%Y-%m-%d %H:%i:%S') as create_time
+		FROM tb_finance_info fi LEFT JOIN sys_user u ON fi.create_user_id=u.user_id
+		LEFT JOIN tb_agency agency ON agency.agency_id=fi.agency_id
+		WHERE 1=1
+		<if test="keyword != null and keyword.trim() != ''">
+			AND fi.title LIKE CONCAT('%',#{keyword},'%')
+		</if>
+		<choose>
+			<when test="sidx != null and sidx.trim() != ''">
+				order by ${sidx} ${order}
+			</when>
+			<otherwise>
+				order by fi.finance_info_id desc
+			</otherwise>
+		</choose>
+		<if test="offset != null and limit != null">
+			limit #{offset}, #{limit}
+		</if>
+	</select>
+
+	<select id="queryFinanceTotal" resultType="int">
+		select count(*) from tb_finance_info WHERE 1=1
+		<if test="keyword != null and keyword.trim() != ''">
+			AND title LIKE CONCAT('%',#{keyword},'%')
+		</if>
+	</select>
+
+	<select id="queryFinanceInfo" resultType="com.hooview.api.dto.FinanceInfoDTO">
+		SELECT fi.finance_info_id,fi.title,fi.summary,fi.content,fi.cover_pic,u.nickname,
+		u.head_url,u.introduce,DATE_FORMAT(fi.create_time,'%Y-%m-%d %H:%i:%S') as create_time,
+		fi.keyword,fi.praise_num,fi.source_url,fi.create_user_id as user_id
+ 		FROM tb_finance_info fi LEFT JOIN sys_user u ON fi.create_user_id=u.user_id
+		WHERE fi.finance_info_id=#{value}
+	</select>
+
+	<select id="queryRecommendList" resultType="com.hooview.api.dto.RecommendDTO">
+		SELECT finance_info_id,title FROM tb_finance_info WHERE 1=1
+		<if test="keyword != null and keyword.trim() != ''">
+			AND keyword LIKE CONCAT('%',#{keyword},'%')
+		</if>
+		ORDER BY create_time limit 5
+	</select>
+
+	<update id="praise" parameterType="com.hooview.api.entity.FinanceInfoEntity">
+		UPDATE tb_finance_info SET `praise_num` = praise_num + #{praiseNum} where finance_info_id = #{financeInfoId}
+	</update>
+	 
+	<insert id="save" parameterType="com.hooview.api.entity.FinanceInfoEntity" useGeneratedKeys="true" keyProperty="financeInfoId">
+		insert into tb_finance_info
+		(
+			`title`, 
+			`content`, 
+			`summary`,
+			`cover_pic`,
+			`keyword`, 
+			`status`, 
+			`type`, 
+			`source_url`, 
+			`banner`, 
+			`praise_num`, 
+			`create_user_id`, 
+			`create_time`,
+			`head_url`,
+			`agency_id`
+		)
+		values
+		(
+			#{title}, 
+			#{content}, 
+			#{summary},
+			#{coverPic},
+			#{keyword}, 
+			#{status}, 
+			#{type}, 
+			#{sourceUrl}, 
+			#{banner}, 
+			#{praiseNum}, 
+			#{createUserId}, 
+			#{createTime},
+			#{headUrl},
+			#{agencyId}
+		)
+	</insert>
+	 
+	<update id="update" parameterType="com.hooview.api.entity.FinanceInfoEntity">
+		update tb_finance_info 
+		<set>
+			<if test="title != null">`title` = #{title}, </if>
+			<if test="content != null">`content` = #{content}, </if>
+			<if test="content != null">`summary` = #{summary}, </if>
+			<if test="coverPic != null">`cover_pic` = #{coverPic}, </if>
+			<if test="keyword != null">`keyword` = #{keyword}, </if>
+			<if test="status != null">`status` = #{status}, </if>
+			<if test="type != null">`type` = #{type}, </if>
+			<if test="sourceUrl != null">`source_url` = #{sourceUrl}, </if>
+			<if test="banner != null">`banner` = #{banner}, </if>
+			<if test="praiseNum != null">`praise_num` = #{praiseNum}, </if>
+			<if test="createUserId != null">`create_user_id` = #{createUserId}, </if>
+			<if test="headUrl != null">`head_url` = #{headUrl}, </if>
+			<if test="agencyId != null">`agency_id` = #{agencyId}, </if>
+			<if test="createTime != null">`create_time` = #{createTime}</if>
+		</set>
+		where finance_info_id = #{financeInfoId}
+	</update>
+	
+	<delete id="delete">
+		delete from tb_finance_info where finance_info_id = #{value}
+	</delete>
+	
+	<delete id="deleteBatch">
+		delete from tb_finance_info where finance_info_id in 
+		<foreach item="financeInfoId" collection="financeInfoIds" open="(" separator="," close=")">
+			#{financeInfoId}
+		</foreach>
+	</delete>
+
+</mapper>

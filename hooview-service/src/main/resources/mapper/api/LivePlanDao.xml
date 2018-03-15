@@ -1,0 +1,125 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.hooview.api.dao.LivePlanDao">
+
+    <!-- 可根据自己的需求，是否要使用 -->
+    <resultMap type="com.hooview.api.entity.LivePlanEntity" id="livePlanMap">
+        <result property="id" column="id"/>
+        <result property="userid" column="userId"/>
+        <result property="dayOfWeek" column="day_of_week"/>
+        <result property="startTime" column="start_time"/>
+        <result property="endTime" column="end_time"/>
+        <result property="course" column="course"/>
+    </resultMap>
+
+    <select id="queryObject" resultType="com.hooview.api.entity.LivePlanEntity">
+        select * from tb_live_plan where id = #{value}
+    </select>
+
+    <select id="queryObjects" resultType="com.hooview.api.entity.LivePlanEntity">
+        select * from tb_live_plan where userId = #{value}
+    </select>
+
+    <select id="queryAnchor" resultType="com.hooview.api.dto.AnchorNameDTO">
+        SELECT ltu.user_id,u.nickname FROM tb_live_type_user ltu JOIN  sys_user u ON ltu.user_id=u.user_id AND u.anchor=1 WHERE ltu.live_type_id=#{value}
+    </select>
+
+    <select id="queryCourseTime" resultType="com.hooview.api.dto.CourseDTO">
+      SELECT start_time, end_time FROM tb_live_plan WHERE userId = #{userId} AND day_of_week = #{dayOfWeek}
+    </select>
+
+    <select id="checkCourse" resultType="Integer">
+       SELECT COUNT(1) FROM tb_live_plan WHERE userId=#{userId}
+       AND day_of_week=#{dayOfWeek} AND (#{sTime} BETWEEN #{startTime} AND #{endTime} OR #{eTime} BETWEEN #{startTime} AND #{endTime})
+    </select>
+
+
+
+    <select id="queryList" resultType="com.hooview.api.entity.LivePlanEntity">
+        select * from tb_live_plan
+        <choose>
+            <when test="sidx != null and sidx.trim() != ''">
+                order by ${sidx} ${order}
+            </when>
+            <otherwise>
+                order by id desc
+            </otherwise>
+        </choose>
+        <if test="offset != null and limit != null">
+            limit #{offset}, #{limit}
+        </if>
+    </select>
+
+    <select id="queryTotal" resultType="int">
+        select count(*) from tb_live_plan
+    </select>
+
+    <select id="queryCourse" resultType="com.hooview.api.entity.LivePlanEntity">
+        select * from tb_live_plan where
+    </select>
+
+    <insert id="save" parameterType="com.hooview.api.entity.LivePlanEntity" useGeneratedKeys="true" keyProperty="id">
+        insert into tb_live_plan
+        (
+        `userId`,
+        `day_of_week`,
+        `start_time`,
+        `end_time`,
+        `course`
+        )
+        values
+        (
+        #{userId},
+        #{dayOfWeek},
+        #{startTime},
+        #{endTime},
+        #{course}
+        )
+    </insert>
+
+    <update id="update" parameterType="com.hooview.api.entity.LivePlanEntity">
+
+        insert into tb_live_plan
+        (
+        `id`,
+        `userid`,
+        `day_of_week`,
+        `start_time`,
+        `end_time`,
+        `course`
+        )
+        values
+        (
+        #{id},
+        #{userId},
+        #{dayOfWeek},
+        #{startTime},
+        #{endTime},
+        #{course}
+        ) on duplicate key update `start_time`= #{startTime},`end_time`=#{endTime},`course`=#{course}
+
+
+        <!--update tb_live_plan-->
+        <!--<set>-->
+            <!--<if test="userid != null">`userId` = #{userid}, </if>-->
+            <!--<if test="dayOfWeek != null">`day_of_week` = #{dayOfWeek}, </if>-->
+            <!--<if test="startTime != null">`start_time` = #{startTime}, </if>-->
+            <!--<if test="endTime != null">`end_time` = #{endTime}, </if>-->
+            <!--<if test="course != null">`course` = #{course}</if>-->
+        <!--</set>-->
+        <!--where id = #{id}-->
+    </update>
+
+    <delete id="deleteCourse" parameterType="com.hooview.api.entity.LivePlanEntity">
+        delete from tb_live_plan where id = #{id}
+    </delete>
+
+    <delete id="deleteBatch">
+        delete from tb_live_plan where id in
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+
+</mapper>

@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.hooview.api.dao.AgencyDao">
+
+    <!-- 可根据自己的需求，是否要使用 -->
+    <resultMap type="com.hooview.api.entity.AgencyEntity" id="agencyMap">
+        <result property="id" column="id"/>
+        <result property="agencyId" column="agency_id"/>
+        <result property="agencyName" column="agency_name"/>
+        <result property="agencyIntroduction" column="agency_introduction"/>
+    </resultMap>
+
+    <select id="queryObject" resultType="com.hooview.api.entity.AgencyEntity">
+        select * from tb_agency where agency_id = #{agencyId}
+    </select>
+
+    <select id="queryList" resultType="com.hooview.api.entity.AgencyEntity">
+        select * from tb_agency
+        <choose>
+            <when test="sidx != null and sidx.trim() != ''">
+                order by ${sidx} ${order}
+            </when>
+            <otherwise>
+                order by agency_id desc
+            </otherwise>
+        </choose>
+        <if test="offset != null and limit != null">
+            limit #{offset}, #{limit}
+        </if>
+    </select>
+
+    <select id="queryTotal" resultType="int">
+        select count(*) from tb_agency
+    </select>
+
+    <insert id="save" parameterType="com.hooview.api.entity.AgencyEntity" useGeneratedKeys="true" keyProperty="id">
+        insert into tb_agency
+        (
+        `agency_name`,
+        `agency_introduction`
+        )
+        values
+        (
+        #{agencyName},
+        #{agencyIntroduction}
+        )
+    </insert>
+
+    <update id="update" parameterType="com.hooview.api.entity.AgencyEntity">
+        update tb_agency
+        <set>
+            <if test="agencyName != null">`agency_name` = #{agencyName}, </if>
+            <if test="agencyIntroduction != null">`agency_introduction` = #{agencyIntroduction}</if>
+        </set>
+        where `agency_id` = #{agencyId}
+    </update>
+
+    <delete id="delete">
+        delete from tb_agency where id = #{value}
+    </delete>
+
+    <delete id="deleteAgency" parameterType="com.hooview.api.entity.AgencyEntity">
+        delete from tb_agency where agency_id in
+        <foreach item="agencyId" collection="agencyIds" open="(" separator="," close=")">
+            #{agencyId}
+        </foreach>
+    </delete>
+
+    <delete id="deleteBatch">
+        delete from tb_agency where id in
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+
+</mapper>

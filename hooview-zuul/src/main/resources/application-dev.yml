@@ -1,0 +1,37 @@
+#环信配置
+easemob:
+  org_name: 1150160929178497
+  app_name: hooview
+  grant_type: client_credentials
+  client_id: YXA6XHQ5wIYIEeaB0U1KTfoEZA
+  client_sectet: YXA6UzcJUSeKQi6oBubdyrod-l_XdHc
+
+#云片配置
+yunpian:
+  apikey: 50eb860aff6fd1ad0e6b2294c66a1282
+  login_tpl_id: 2156926
+  updatepw_tpl_id: 2156928
+
+#阿里云OSS
+aliyunoss:
+  endpoint: http://oss-cn-beijing.aliyuncs.com
+  accessKeyId: LTAI9kgRRh2eU3Cd
+  accessKeySecret: u58apwTfGPSYmVXuVAYWawmkT7eS5K
+  bucketNameHeader: hooviewheader
+  bucketNameBanner: hooviewbanner
+  bucketLaunchlive: hooviewlaunchlive
+
+#redis
+redis:
+  addr_array: localhost
+  auth: hooview666
+  max_active: 8
+  max_idle: 8
+  max_wait: 10000
+  timeout: 10000
+
+#注册中心
+eureka:
+  client:
+    serviceUrl:
+      defaultZone: http://hooview:hooview123@localhost:8660/eureka/

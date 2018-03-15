@@ -1,0 +1,217 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.hooview.api.dao.LiveDao">
+
+	<!-- 可根据自己的需求，是否要使用 -->
+    <resultMap type="com.hooview.api.entity.LiveEntity" id="liveMap">
+        <result property="liveId" column="live_id"/>
+        <result property="liveTitle" column="live_title"/>
+        <result property="liveInfo" column="live_info"/>
+        <result property="liveUrl" column="live_url"/>
+        <result property="liveTypeId" column="live_type_id"/>
+        <result property="liveVip" column="live_vip"/>
+        <result property="livePrice" column="live_price"/>
+        <result property="userId" column="user_id"/>
+        <result property="liveStatus" column="live_status"/>
+        <result property="recommend" column="recommend"/>
+        <result property="createTime" column="create_time"/>
+        <result property="vid" column="vid"/>
+        <result property="watchCount" column="watch_count"/>
+        <result property="likeCount" column="like_count"/>
+        <result property="watchingCount" column="watching_count"/>
+        <result property="duration" column="duration"/>
+        <result property="liveStopTime" column="live_stop_time"/>
+        <result property="location" column="location"/>
+        <result property="logourl" column="logourl"/>
+		<result property="roomId" column="room_id"/>
+		<result property="sortOrder" column="sort_order"/>
+    </resultMap>
+
+	<select id="queryByVid" resultType="com.hooview.api.entity.LiveEntity">
+		select * from tb_live where vid = #{value}
+	</select>
+
+	<select id="queryLiveId" resultType="java.lang.Long">
+		select live_id from tb_live where vid = #{value}
+	</select>
+
+	<select id="queryByKeyword" resultType="java.lang.Long">
+		select live_id FROM tb_live WHERE live_title like CONCAT('%',#{keyword},'%') AND live_status=1
+	</select>
+
+	<!-- query live by vid -->
+	<select id="queryObject" resultType="com.hooview.api.dto.LiveInfoDTO">
+		select * from tb_live where live_id = #{value}
+	</select>
+
+	<select id="queryadminObject" resultType="com.hooview.api.dto.LiveInfoDTO">
+		select *,(SELECT type_name FROM tb_live_type WHERE live_type_id = tb_live.live_type_id) liveTypeName,
+		(SELECT nickname FROM sys_user WHERE user_id = tb_live.user_id) nickname from tb_live where live_id = #{value}
+	</select>
+
+	<select id="queryList" resultType="com.hooview.api.entity.LiveEntity">
+		select live.*,lt.type_name AS live_type_name from tb_live live,tb_live_type lt where live.live_type_id = lt.live_type_id
+		<if test="recommend != null and recommend.trim() != ''">
+			AND live.recommend = #{recommend} and live.live_status=1
+		</if>
+        <choose>
+            <when test="sidx != null and sidx.trim() != ''">
+                order by ${sidx} ${order}
+            </when>
+			<when test="recommend != null and recommend.trim() != ''">
+				order by live.sort_order asc
+			</when>
+			<otherwise>
+                order by live.live_id desc
+			</otherwise>
+        </choose>
+		<if test="offset != null and limit != null">
+			limit #{offset}, #{limit}
+		</if>
+	</select>
+	
+ 	<select id="queryTotal" resultType="int">
+		select count(*) from tb_live 
+	</select>
+	 
+	<insert id="save" parameterType="com.hooview.api.entity.LiveEntity" useGeneratedKeys="true" keyProperty="liveId">
+		insert into tb_live
+		(
+			`live_title`, 
+			`live_info`, 
+			`live_url`, 
+			`live_type_id`, 
+			`live_vip`, 
+			`live_price`, 
+			`user_id`, 
+			`live_status`, 
+			`recommend`, 
+			`create_time`, 
+			`vid`, 
+			`watch_count`, 
+			`like_count`, 
+			`watching_count`, 
+			`duration`, 
+			`live_stop_time`, 
+			`location`, 
+			`logourl`,
+			`room_id`,
+			`sort_order`
+		)
+		values
+		(
+			#{liveTitle}, 
+			#{liveInfo}, 
+			#{liveUrl}, 
+			#{liveTypeId}, 
+			#{liveVip}, 
+			#{livePrice}, 
+			#{userId}, 
+			#{liveStatus}, 
+			#{recommend}, 
+			#{createTime}, 
+			#{vid}, 
+			#{watchCount}, 
+			#{likeCount}, 
+			#{watchingCount}, 
+			#{duration}, 
+			#{liveStopTime}, 
+			#{location}, 
+			#{logourl},
+			#{roomId},
+			#{sortOrder}
+		)
+	</insert>
+
+	<select id="queryAdminTotal" resultType="int">
+		SELECT
+		COUNT(*)
+		FROM tb_live live WHERE  1=1
+		<if test="liveVip != null and liveVip.trim() != ''">
+			AND live.live_vip = #{liveVip}
+		</if>
+		<if test="liveTypeId != null and liveTypeId.trim() != ''">
+			AND live.live_type_id = #{liveTypeId}
+		</if>
+		<if test="recommend != null and recommend.trim() != ''">
+			AND live.recommend = #{recommend}
+		</if>
+		<if test="keyword != null and keyword.trim() != ''">
+			AND live.live_title like CONCAT('%',#{keyword},'%')
+		</if>
+	</select>
+
+	<select id="adminList" resultType="com.hooview.api.dto.LiveDTO">
+		SELECT live.live_id,live.live_title,lt.type_name liveTypeName,live.live_vip,
+		live.recommend,live.live_price,u.nickname,live.live_status,
+		live.live_stop_time,live.location,live.logourl,sort_order
+		FROM tb_live live,tb_live_type lt,sys_user u
+		WHERE live.live_type_id =lt.live_type_id and live.user_id=u.user_id
+		<if test="liveVip != null and liveVip.trim() != ''">
+			AND live.live_vip = #{liveVip}
+		</if>
+		<if test="liveTypeId != null and liveTypeId.trim() != ''">
+			AND live.live_type_id = #{liveTypeId}
+		</if>
+		<if test="recommend != null and recommend.trim() != ''">
+			AND live.recommend = #{recommend}
+		</if>
+		<if test="keyword != null and keyword.trim() != ''">
+			AND live.live_title like CONCAT('%',#{keyword},'%')
+		</if>
+		<choose>
+			<when test="sidx != null and sidx.trim() != ''">
+				order by ${sidx} ${order}
+			</when>
+			<when test="recommend != null and recommend.trim() != ''">
+				order by sort_order asc
+			</when>
+			<otherwise>
+				order by live_id desc
+			</otherwise>
+		</choose>
+		<if test="offset != null and limit != null">
+			limit #{offset}, #{limit}
+		</if>
+	</select>
+	 
+	<update id="update" parameterType="com.hooview.api.entity.LiveEntity">
+		update tb_live 
+		<set>
+			<if test="liveTitle != null">`live_title` = #{liveTitle}, </if>
+			<if test="liveInfo != null">`live_info` = #{liveInfo}, </if>
+			<if test="liveUrl != null">`live_url` = #{liveUrl}, </if>
+			<if test="liveTypeId != null">`live_type_id` = #{liveTypeId}, </if>
+			<if test="liveVip != null">`live_vip` = #{liveVip}, </if>
+			<if test="livePrice != null">`live_price` = #{livePrice}, </if>
+			<if test="userId != null">`user_id` = #{userId}, </if>
+			<if test="liveStatus != null">`live_status` = #{liveStatus}, </if>
+			<if test="recommend != null">`recommend` = #{recommend}, </if>
+			<if test="createTime != null">`create_time` = #{createTime}, </if>
+			<if test="vid != null">`vid` = #{vid}, </if>
+			<if test="watchCount != null">`watch_count` = #{watchCount}, </if>
+			<if test="likeCount != null">`like_count` = #{likeCount}, </if>
+			<if test="watchingCount != null">`watching_count` = #{watchingCount}, </if>
+			<if test="duration != null">`duration` = #{duration}, </if>
+			<if test="liveStopTime != null">`live_stop_time` = #{liveStopTime}, </if>
+			<if test="location != null">`location` = #{location}, </if>
+			<if test="logourl != null">`logourl` = #{logourl},</if>
+			<if test="roomId != null">`room_id` = #{roomId},</if>
+			<if test="sortOrder != null">`sort_order` = #{sortOrder}</if>
+		</set>
+		where live_id = #{liveId}
+	</update>
+	
+	<delete id="delete">
+		delete from tb_live where live_id = #{value}
+	</delete>
+	
+	<delete id="deleteAdminBatch">
+		delete from tb_live where live_id in 
+		<foreach item="liveId" collection="liveIds" open="(" separator="," close=")">
+			#{liveId}
+		</foreach>
+	</delete>
+
+</mapper>

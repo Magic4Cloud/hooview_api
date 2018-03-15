@@ -1,0 +1,314 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.hooview.dao.SysUserDao">
+
+	<!-- 可根据自己的需求，是否要使用 -->
+    <resultMap type="com.hooview.entity.SysUserEntity" id="sysUserMap">
+        <result property="userId" column="user_id"/>
+        <result property="nickname" column="nickname"/>
+        <result property="username" column="username"/>
+        <result property="password" column="password"/>
+        <result property="salt" column="salt"/>
+        <result property="headUrl" column="head_url"/>
+        <result property="email" column="email"/>
+        <result property="mobile" column="mobile"/>
+        <result property="sex" column="sex"/>
+        <result property="region" column="region"/>
+        <result property="introduce" column="introduce"/>
+        <result property="anchor" column="anchor"/>
+        <result property="status" column="status"/>
+        <result property="anchorAudit" column="anchor_audit"/>
+        <result property="follow" column="follow"/>
+        <result property="fans" column="fans"/>
+        <result property="createTime" column="create_time"/>
+		<result property="anchorTime" column="anchor_time"/>
+		<result property="yiId" column="yi_id"/>
+    </resultMap>
+
+	<select id="queryObject" resultType="com.hooview.entity.SysUserEntity">
+		SELECT
+		u.*, tu.live_type_id
+		FROM
+		sys_user u
+		LEFT JOIN tb_live_type_user tu ON u.user_id = tu.user_id WHERE u.user_id = #{value}
+	</select>
+
+	<select id="queryAgencyId" resultType="Long">
+		select agency_id from sys_user where user_id = #{userId}
+	</select>
+
+	<select id="queryList" resultType="com.hooview.entity.SysUserEntity">
+		select u.* from sys_user u
+		<if test="admin != null and admin.trim() != ''">
+			LEFT  JOIN  sys_user_role ur on u.user_id = ur.user_id
+		</if>
+
+		WHERE 1=1
+		<if test="nickname != null and nickname != null">
+			and nickname= #{nickname}
+		</if>
+		<if test="mobile != null and mobile != null">
+			and mobile= #{mobile}
+		</if>
+		<if test="anchor != null and anchor != null">
+			and anchor= #{anchor}
+		</if>
+		<choose>
+			<when test="admin != null and admin==0">
+				and ur.role_id = 0
+			</when>
+			<otherwise>
+				and ur.role_id > 0
+			</otherwise>
+		</choose>
+        <choose>
+            <when test="sidx != null and sidx.trim() != ''">
+                order by ${sidx} ${order}
+            </when>
+			<otherwise>
+                order by user_id desc
+			</otherwise>
+        </choose>
+		<if test="offset != null and limit != null">
+			limit #{offset}, #{limit}
+		</if>
+	</select>
+
+	<select id="queryAnchorUser" resultType="com.hooview.api.dto.AnchorUserDTO">
+		select u.*,ag.agency_name from sys_user u
+		<if test="admin != null and admin.trim() != ''">
+			LEFT  JOIN  sys_user_role ur on u.user_id = ur.user_id
+		</if>
+		LEFT JOIN tb_agency ag ON u.agency_id=ag.agency_id
+
+		WHERE 1=1
+		<if test="nickname != null and nickname != null">
+			and nickname= #{nickname}
+		</if>
+		<if test="mobile != null and mobile != null">
+			and mobile= #{mobile}
+		</if>
+		<if test="anchor != null and anchor != null">
+			and anchor= #{anchor}
+		</if>
+		<choose>
+			<when test="admin != null and admin==0">
+				and ur.role_id = 0
+			</when>
+			<otherwise>
+				and ur.role_id > 0
+			</otherwise>
+		</choose>
+		<choose>
+			<when test="sidx != null and sidx.trim() != ''">
+				order by ${sidx} ${order}
+			</when>
+			<otherwise>
+				order by user_id desc
+			</otherwise>
+		</choose>
+		<if test="offset != null and limit != null">
+			limit #{offset}, #{limit}
+		</if>
+	</select>
+
+	<select id="queryApplyAnchorList" resultType="com.hooview.api.dto.ApplyAnchorDTO">
+		SELECT user_id,username,mobile phone,DATE_FORMAT(anchor_time,'%Y-%m-%d %H:%i:%S') as create_time,
+		CASE WHEN anchor_audit=1 THEN '待审核' WHEN anchor_audit=2 THEN '审核通过' ELSE '审核不通过' END  AS anchor_audit
+		FROM sys_user WHERE anchor_audit = 1
+		<choose>
+			<when test="sidx != null and sidx.trim() != ''">
+				order by ${sidx} ${order}
+			</when>
+			<otherwise>
+				order by user_id desc
+			</otherwise>
+		</choose>
+		<if test="offset != null and limit != null">
+			limit #{offset}, #{limit}
+		</if>
+	</select>
+
+	<select id="queryApplyAnchorTotal" resultType="int">
+		select count(*) from sys_user WHERE anchor_audit = 1
+	</select>
+	
+ 	<select id="queryTotal" resultType="int">
+		select count(u.user_id) from sys_user u
+		<if test="admin != null and admin.trim() != ''">
+			LEFT  JOIN  sys_user_role ur on u.user_id = ur.user_id
+		</if>
+		LEFT JOIN tb_agency ag ON u.agency_id=ag.agency_id
+		WHERE 1=1
+		<if test="nickname != null and nickname != null">
+			and nickname= #{nickname}
+		</if>
+		<if test="mobile != null and mobile != null">
+			and mobile= #{mobile}
+		</if>
+		<if test="anchor != null and anchor != null">
+			and anchor= #{anchor}
+		</if>
+		<choose>
+			<when test="admin != null and admin==0">
+				and ur.role_id = 0
+			</when>
+			<otherwise>
+				and ur.role_id > 0
+			</otherwise>
+		</choose>
+	</select>
+
+	<select id="queryByMobile" resultType="com.hooview.entity.SysUserEntity">
+		select * from sys_user where mobile=#{value}
+	</select>
+
+	<!-- 查询用户的所有权限 -->
+	<select id="queryAllPerms" resultType="string">
+		select m.perms from sys_user_role ur
+		LEFT JOIN sys_role_menu rm on ur.role_id = rm.role_id
+		LEFT JOIN sys_menu m on rm.menu_id = m.menu_id
+		where ur.user_id = #{userId}
+	</select>
+
+	<!-- 查询用户的所有角色 -->
+	<select id="queryAllRoles" resultType="long">
+		select lur.role_id from sys_user lu LEFT JOIN sys_user_role lur  ON lur.user_id=lu.user_id where lu.user_id = #{userId}
+	</select>
+
+	<select id="queryAnchorList" resultType="com.hooview.api.dto.AnchorDTO">
+		SELECT user_id,username,mobile,sex,region FROM sys_user where anchor=1
+		<if test="username != null and username.trim() != ''">
+			AND username like CONCAT('%',#{username},'%')
+		</if>
+		ORDER BY create_time
+		limit 50
+	</select>
+
+	<!-- 查询用户的所有菜单ID -->
+	<select id="queryAllMenuId" resultType="long">
+		select distinct rm.menu_id from sys_user_role ur
+		LEFT JOIN sys_role_menu rm on ur.role_id = rm.role_id
+		where ur.user_id = #{userId}
+	</select>
+
+	<select id="queryByYiId" resultType="com.hooview.api.dto.UserDTO">
+		select user_id,mobile from sys_user where yi_id = #{yiId}
+	</select>
+
+	<insert id="save" parameterType="com.hooview.entity.SysUserEntity" useGeneratedKeys="true" keyProperty="userId">
+		insert into sys_user
+		(
+			`nickname`, 
+			`username`, 
+			`password`, 
+			`salt`, 
+			`head_url`, 
+			`email`, 
+			`mobile`, 
+			`sex`, 
+			`region`, 
+			`introduce`, 
+			`anchor`, 
+			`status`, 
+			`anchor_audit`, 
+			`follow`, 
+			`fans`, 
+			`create_time`,
+			`anchor_time`,
+			`yi_id`,
+			`agency_id`
+
+		)
+		values
+		(
+			#{nickname}, 
+			#{username}, 
+			#{password}, 
+			#{salt}, 
+			#{headUrl}, 
+			#{email}, 
+			#{mobile}, 
+			#{sex}, 
+			#{region}, 
+			#{introduce}, 
+			#{anchor}, 
+			#{status}, 
+			#{anchorAudit}, 
+			#{follow}, 
+			#{fans}, 
+			#{createTime},
+			#{anchorTime},
+			#{yiId},
+			#{agencyId}
+		)
+	</insert>
+	 
+	<update id="update" parameterType="com.hooview.entity.SysUserEntity">
+		update sys_user 
+		<set>
+			<if test="nickname != null">`nickname` = #{nickname}, </if>
+			<if test="username != null">`username` = #{username}, </if>
+			<if test="headUrl != null">`head_url` = #{headUrl}, </if>
+			<if test="mobile != null">`mobile` = #{mobile}, </if>
+			<if test="sex != null">`sex` = #{sex}, </if>
+			<if test="region != null">`region` = #{region}, </if>
+			<if test="anchor != null">`anchor` = #{anchor}, </if>
+			<if test="status != null">`status` = #{status}, </if>
+			<if test="follow != null">`follow` = #{follow}, </if>
+			<if test="fans != null">`fans` = #{fans}, </if>
+			<if test="introduce != null">`introduce` = #{introduce},</if>
+			<if test="anchorTime != null">`anchor_time` = #{anchorTime},</if>
+			<if test="yiId != null">`yi_id` = #{yiId}, </if>
+			<if test="agencyId != null">`agency_id` = #{agencyId} </if>
+		</set>
+		where user_id = #{userId}
+	</update>
+
+	<update id="applyAnchor" parameterType="com.hooview.api.dto.ApplyAnchorDTO">
+		update sys_user
+		SET anchor_audit = 1,username = #{username}
+		where user_id = #{userId}
+	</update>
+
+	<update id="auditApplyAnchor" parameterType="com.hooview.entity.SysUserEntity">
+		update sys_user
+		<set>
+			<if test="anchorAudit != null">`anchor_audit` = #{anchorAudit}, </if>
+			<if test="anchor != null">`anchor` = #{anchor}, </if>
+			<if test="yiId != null and yiId.trim() != ''">`yi_id` = #{yiId}, </if>
+			<if test="anchorTime != null">`anchor_time` = #{anchorTime}, </if>
+		</set>
+		where user_id = #{userId}
+	</update>
+
+	<update id="addFans">
+		update sys_user
+		SET fans = fans + #{fans}
+		where user_id = #{userId}
+	</update>
+
+	<update id="addFollow">
+		update sys_user
+		SET follow = follow + #{follow}
+		where user_id = #{fansUserId}
+	</update>
+	
+	<delete id="delete">
+		delete from sys_user where user_id = #{value}
+	</delete>
+	
+	<delete id="deleteBatch">
+		delete from sys_user where user_id in 
+		<foreach item="userId" collection="array" open="(" separator="," close=")">
+			#{userId}
+		</foreach>
+	</delete>
+
+	<update id="updatePassword" parameterType="map">
+		update sys_user set `password` = #{newPassword}
+		where mobile = #{mobile}
+	</update>
+
+</mapper>

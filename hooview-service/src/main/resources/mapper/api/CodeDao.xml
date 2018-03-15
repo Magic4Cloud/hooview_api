@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.hooview.api.dao.CodeDao">
+
+	<!-- 可根据自己的需求，是否要使用 -->
+    <resultMap type="com.hooview.api.entity.CodeEntity" id="codeMap">
+        <result property="id" column="id"/>
+        <result property="code" column="code"/>
+        <result property="mobile" column="mobile"/>
+        <result property="expiretime" column="expiretime"/>
+    </resultMap>
+
+	<select id="queryObject" resultType="com.hooview.api.entity.CodeEntity">
+		select * from tb_code where id = #{value}
+	</select>
+
+	<select id="queryByCheckCode" resultType="com.hooview.api.entity.CodeEntity">
+		select * from tb_code where mobile= #{phone} and `code`=  #{code} and expiretime >= now() limit 1;
+	</select>
+	 
+	<insert id="save" parameterType="com.hooview.api.entity.CodeEntity" useGeneratedKeys="true" keyProperty="id">
+		insert into tb_code
+		(
+			`code`, 
+			`mobile`, 
+			`expiretime`
+		)
+		values
+		(
+			#{code}, 
+			#{mobile}, 
+			#{expiretime}
+		)
+	</insert>
+	 
+	<update id="update" parameterType="com.hooview.api.entity.CodeEntity">
+		update tb_code 
+		<set>
+			<if test="code != null">`code` = #{code}, </if>
+			<if test="mobile != null">`mobile` = #{mobile}, </if>
+			<if test="expiretime != null">`expiretime` = #{expiretime}</if>
+		</set>
+		where id = #{id}
+	</update>
+	
+	<delete id="delete">
+		delete from tb_code where id = #{value}
+	</delete>
+	
+	<delete id="deleteBatch">
+		delete from tb_code where id in 
+		<foreach item="id" collection="array" open="(" separator="," close=")">
+			#{id}
+		</foreach>
+	</delete>
+
+</mapper>

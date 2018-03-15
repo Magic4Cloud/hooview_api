@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.hooview.api.dao.OpenApplyDao">
+
+	<!-- 可根据自己的需求，是否要使用 -->
+    <resultMap type="com.hooview.api.entity.OpenApplyEntity" id="openApplyMap">
+        <result property="openApplyId" column="open_apply_id"/>
+        <result property="userName" column="user_name"/>
+        <result property="mobile" column="mobile"/>
+		<result property="auditOpinion" column="audit_opinion"/>
+        <result property="status" column="status"/>
+    </resultMap>
+
+	<select id="queryObject" resultType="com.hooview.api.entity.OpenApplyEntity">
+		select * from tb_open_apply where open_apply_id = #{value}
+	</select>
+
+	<!--检查是否已经提交过开户申请 -->
+	<select id="queryByMobile" resultType="com.hooview.api.entity.OpenApplyEntity">
+		select * from tb_open_apply where mobile = #{value}
+	</select>
+
+	<select id="queryList" resultType="com.hooview.api.entity.OpenApplyEntity">
+		select * from tb_open_apply
+        <choose>
+            <when test="sidx != null and sidx.trim() != ''">
+                order by ${sidx} ${order}
+            </when>
+			<otherwise>
+                order by open_apply_id desc
+			</otherwise>
+        </choose>
+		<if test="offset != null and limit != null">
+			limit #{offset}, #{limit}
+		</if>
+	</select>
+	
+ 	<select id="queryTotal" resultType="int">
+		select count(*) from tb_open_apply 
+	</select>
+	 
+	<insert id="save" parameterType="com.hooview.api.entity.OpenApplyEntity" useGeneratedKeys="true" keyProperty="openApplyId">
+		insert into tb_open_apply
+		(
+			`user_name`, 
+			`mobile`,
+			`audit_opinion`,
+			`status`,
+			`create_time`
+		)
+		values
+		(
+			#{userName}, 
+			#{mobile},
+			#{auditOpinion},
+			#{status},
+			now()
+		)
+	</insert>
+	 
+	<update id="update" parameterType="com.hooview.api.entity.OpenApplyEntity">
+		update tb_open_apply 
+		<set>
+			<if test="userName != null">`user_name` = #{userName}, </if>
+			<if test="mobile != null">`mobile` = #{mobile}, </if>
+			<if test="auditOpinion != null">`audit_opinion` = #{auditOpinion}, </if>
+			<if test="status != null">`status` = #{status}</if>
+		</set>
+		where open_apply_id = #{openApplyId} AND status = 1
+	</update>
+	
+	<delete id="delete">
+		delete from tb_open_apply where open_apply_id = #{value}
+	</delete>
+	
+	<delete id="deleteBatch">
+		delete from tb_open_apply where open_apply_id in 
+		<foreach item="openApplyId" collection="array" open="(" separator="," close=")">
+			#{openApplyId}
+		</foreach>
+	</delete>
+
+</mapper>

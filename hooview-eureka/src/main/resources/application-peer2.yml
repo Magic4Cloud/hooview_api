@@ -1,0 +1,25 @@
+server:
+  port: 8661
+
+eureka:
+  instance:
+    hostname: peer2
+  client:
+    registerWithEureka: false # 表示为server
+    fetchRegistry: false # 表示为server
+    serviceUrl:
+      defaultZone: http://hooview:hooview123@peer1:8660/eureka/
+  server:
+    enable-self-preservation: false #关闭自我保护
+    eviction-interval-timer-in-ms: 10000 #过期时间10秒
+
+spring:
+    # 环境 dev|pro
+    profiles:
+        active: dev
+security:
+  basic:
+    enabled: true #开启认证
+  user:
+    name: hooview #用户名
+    password: hooview123 #密码

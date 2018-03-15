@@ -1,0 +1,161 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.hooview.api.dao.FansDao">
+
+	<!-- 可根据自己的需求，是否要使用 -->
+    <resultMap type="com.hooview.api.entity.FansEntity" id="fansMap">
+        <result property="userId" column="user_id"/>
+        <result property="fansUserId" column="fans_user_id"/>
+        <result property="mutual" column="mutual"/>
+    </resultMap>
+
+	<select id="queryObject" resultType="com.hooview.api.entity.FansEntity">
+		select * from tb_fans where user_id = #{value}
+	</select>
+
+	<select id="getFollow" resultType="com.hooview.api.entity.FansEntity">
+		SELECT * FROM tb_fans WHERE fans_user_id = #{fansUserId} AND user_id=#{userId}
+	</select>
+
+	<select id="queryList" resultType="com.hooview.api.entity.FansEntity">
+		select * from tb_fans
+        <choose>
+            <when test="sidx != null and sidx.trim() != ''">
+                order by ${sidx} ${order}
+            </when>
+			<otherwise>
+                order by user_id desc
+			</otherwise>
+        </choose>
+		<if test="offset != null and limit != null">
+			limit #{offset}, #{limit}
+		</if>
+	</select>
+
+	<select id="queryFollowList" resultType="com.hooview.api.dto.FansDTO">
+		SELECT u.user_id,u.nickname,u.head_url,u.introduce,fans.mutual
+		FROM tb_fans fans RIGHT JOIN sys_user u
+		ON fans.user_id = u.user_id
+		WHERE fans.fans_user_id = #{userId}
+		<choose>
+			<when test="sidx != null and sidx.trim() != ''">
+				order by ${sidx} ${order}
+			</when>
+			<otherwise>
+				order by fans.user_id desc
+			</otherwise>
+		</choose>
+		<if test="offset != null and limit != null">
+			limit #{offset}, #{limit}
+		</if>
+	</select>
+
+	<select id="queryFansList" resultType="com.hooview.api.dto.FansDTO">
+		SELECT u.user_id,u.nickname,u.head_url,u.introduce,fans.mutual
+		FROM tb_fans fans RIGHT JOIN sys_user u
+		ON fans.fans_user_id = u.user_id
+		WHERE fans.user_id = #{userId}
+		<choose>
+			<when test="sidx != null and sidx.trim() != ''">
+				order by ${sidx} ${order}
+			</when>
+			<otherwise>
+				order by fans.user_id desc
+			</otherwise>
+		</choose>
+		<if test="offset != null and limit != null">
+			limit #{offset}, #{limit}
+		</if>
+	</select>
+	
+ 	<select id="queryTotal" resultType="int">
+		select count(u.user_id)
+		FROM tb_fans fans LEFT JOIN sys_user u
+		ON fans.user_id = u.user_id
+		WHERE fans.fans_user_id = #{userId}
+	</select>
+
+	<select id="queryFansTotal" resultType="int">
+		select count(u.user_id)
+		FROM tb_fans fans LEFT JOIN sys_user u
+		ON fans.fans_user_id = u.user_id
+		WHERE fans.user_id = #{userId}
+	</select>
+
+	<select id="followEach" resultType="int">
+		select count(*)
+		FROM tb_fans
+		WHERE user_id = #{fansUserId} and fans_user_id = #{userId}
+	</select>
+
+	<select id="followed" resultType="int">
+		select count(*)
+		FROM tb_fans
+		WHERE user_id = #{userId} and fans_user_id = #{fansUserId}
+	</select>
+	 
+	<insert id="save" parameterType="com.hooview.api.entity.FansEntity">
+		insert into tb_fans
+		(
+			`user_id`, 
+			`fans_user_id`, 
+			`mutual`
+		)
+		values
+		(
+			#{userId}, 
+			#{fansUserId}, 
+			#{mutual}
+		)
+	</insert>
+
+	<insert id="follow" parameterType="com.hooview.api.entity.FansEntity">
+		insert into tb_fans
+		(
+		`user_id`,
+		`fans_user_id`,
+		`mutual`
+		)
+		values
+		(
+		#{userId},
+		#{fansUserId},
+		#{mutual}
+		) ON DUPLICATE KEY UPDATE
+		`user_id`=#{userId},
+		`fans_user_id`=#{fansUserId},
+		`mutual`=#{mutual}
+	</insert>
+	 
+	<update id="update" parameterType="com.hooview.api.entity.FansEntity">
+		update tb_fans 
+		<set>
+			<if test="fansUserId != null">`fans_user_id` = #{fansUserId}, </if>
+			<if test="mutual != null">`mutual` = #{mutual}</if>
+		</set>
+		where user_id = #{userId}
+	</update>
+
+	<update id="updateMutual" parameterType="com.hooview.api.entity.FansEntity">
+		update tb_fans
+		set `mutual` = #{mutual}
+		where user_id = #{fansUserId} and `fans_user_id` = #{userId}
+	</update>
+	
+	<delete id="delete">
+		delete from tb_fans where user_id = #{value}
+	</delete>
+
+	<delete id="deleteFollow" parameterType="com.hooview.api.entity.FansEntity">
+		delete from tb_fans where user_id = #{userId} and fans_user_id = #{fansUserId}
+	</delete>
+	
+	<delete id="deleteBatch">
+		delete from tb_fans where user_id in 
+		<foreach item="userId" collection="array" open="(" separator="," close=")">
+			#{userId}
+		</foreach>
+	</delete>
+
+</mapper>

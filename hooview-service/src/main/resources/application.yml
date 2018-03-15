@@ -1,0 +1,17 @@
+server:
+  port: 8662
+spring:
+  application:
+    name: hooview-service
+  profiles:
+    active: dev
+  # jackson时间格式化
+  jackson:
+    time-zone: GMT+8
+    date-format: yyyy-MM-dd HH:mm:ss
+
+
+# Mybatis配置
+mybatis:
+  mapperLocations: classpath:mapper/*.xml,classpath:mapper/api/*.xml
+  configLocation: classpath:mybatis.xml

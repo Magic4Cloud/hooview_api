@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.hooview.api.dao.RemindDao">
+
+	<!-- 可根据自己的需求，是否要使用 -->
+    <resultMap type="com.hooview.api.entity.RemindEntity" id="remindMap">
+        <result property="liveId" column="live_id"/>
+        <result property="userId" column="user_id"/>
+    </resultMap>
+
+	<select id="queryObject" resultType="com.hooview.api.entity.RemindEntity">
+		select * from tb_remind where live_id = #{value}
+	</select>
+
+	<select id="queryList" resultType="com.hooview.api.entity.RemindEntity">
+		select * from tb_remind
+        <choose>
+            <when test="sidx != null and sidx.trim() != ''">
+                order by ${sidx} ${order}
+            </when>
+			<otherwise>
+                order by live_id desc
+			</otherwise>
+        </choose>
+		<if test="offset != null and limit != null">
+			limit #{offset}, #{limit}
+		</if>
+	</select>
+	
+ 	<select id="queryTotal" resultType="int">
+		select count(*) from tb_remind 
+	</select>
+	 
+	<insert id="save" parameterType="com.hooview.api.entity.RemindEntity">
+		insert into tb_remind
+		(
+			`live_id`, 
+			`user_id`
+		)
+		values
+		(
+			#{liveId}, 
+			#{userId}
+		)
+	</insert>
+	 
+	<update id="update" parameterType="com.hooview.api.entity.RemindEntity">
+		update tb_remind 
+		<set>
+			<if test="userId != null">`user_id` = #{userId}</if>
+		</set>
+		where live_id = #{liveId}
+	</update>
+	
+	<delete id="delete">
+		delete from tb_remind where live_id = #{value}
+	</delete>
+	
+	<delete id="deleteBatch">
+		delete from tb_remind where live_id in 
+		<foreach item="liveId" collection="array" open="(" separator="," close=")">
+			#{liveId}
+		</foreach>
+	</delete>
+
+</mapper>
