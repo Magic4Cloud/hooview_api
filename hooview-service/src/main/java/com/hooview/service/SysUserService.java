@@ -1,11 +1,6 @@
 package com.hooview.service;
 
-import com.hooview.api.dto.AnchorDTO;
-import com.hooview.api.dto.AnchorUserDTO;
-import com.hooview.api.dto.ApplyAnchorDTO;
-import com.hooview.api.dto.UserDTO;
 import com.hooview.entity.SysUserEntity;
-import org.apache.ibatis.annotations.Param;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -42,26 +37,12 @@ public interface SysUserService {
 	@RequestMapping(value="/user/queryObject",method = RequestMethod.GET)
 	SysUserEntity queryObject(Long userId);
 
-	/**
-	 * 查询用户列表
-	 */
-	@RequestMapping(value="/user/queryList",method = RequestMethod.GET)
-	List<AnchorUserDTO> queryList(@RequestParam Map<String, Object> map);
 
 	/**
 	 * 查询总数
 	 */
 	@RequestMapping(value="/user/queryTotal",method = RequestMethod.GET)
 	int queryTotal(@RequestParam Map<String, Object> map);
-
-	@RequestMapping(value = "/user/apply",method = RequestMethod.POST)
-	void applyAnchor(@RequestBody ApplyAnchorDTO user);
-
-	/**
-	 * 查询申请主播列表
-	 */
-	@RequestMapping(value = "/user/ApplyAnchorList",method = RequestMethod.GET)
-	List<ApplyAnchorDTO> queryApplyAnchorList(@RequestParam Map<String, Object> map);
 
 	/**
 	 * 查询总数
@@ -96,8 +77,6 @@ public interface SysUserService {
 
 	/**
 	 * 修改密码
-	 * @param userId       用户ID
-	 * @param password     原密码
 	 * @param newPassword  新密码
 	 */
 	@RequestMapping(value="/user/updatePassword",method = RequestMethod.POST)
@@ -106,11 +85,7 @@ public interface SysUserService {
 	@RequestMapping(value="/user/queryByMobile",method = RequestMethod.GET)
 	SysUserEntity queryByMobile(String mobile);
 
-	@RequestMapping(value="/user/queryAnchorList",method = RequestMethod.GET)
-	List<AnchorDTO> queryAnchorList(@RequestParam("username") String username);
 
-	@RequestMapping(value="/user/queryByYiId",method = RequestMethod.GET)
-	UserDTO queryByYiId(@RequestParam("yiId") String yiId);
 
 	@RequestMapping(value="/user/queryAgencyId",method = RequestMethod.GET)
 	Long queryAgencyId(@RequestParam("userId") Long userId);

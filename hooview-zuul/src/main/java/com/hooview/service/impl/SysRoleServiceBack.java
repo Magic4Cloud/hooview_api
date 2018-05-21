@@ -1,6 +1,5 @@
 package com.hooview.service.impl;
 
-import com.hooview.api.dto.SelectRoleDTO;
 import com.hooview.entity.SysRoleEntity;
 import com.hooview.service.SysRoleService;
 import org.springframework.stereotype.Component;

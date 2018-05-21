@@ -75,60 +75,6 @@
 		</if>
 	</select>
 
-	<select id="queryAnchorUser" resultType="com.hooview.api.dto.AnchorUserDTO">
-		select u.*,ag.agency_name from sys_user u
-		<if test="admin != null and admin.trim() != ''">
-			LEFT  JOIN  sys_user_role ur on u.user_id = ur.user_id
-		</if>
-		LEFT JOIN tb_agency ag ON u.agency_id=ag.agency_id
-
-		WHERE 1=1
-		<if test="nickname != null and nickname != null">
-			and nickname= #{nickname}
-		</if>
-		<if test="mobile != null and mobile != null">
-			and mobile= #{mobile}
-		</if>
-		<if test="anchor != null and anchor != null">
-			and anchor= #{anchor}
-		</if>
-		<choose>
-			<when test="admin != null and admin==0">
-				and ur.role_id = 0
-			</when>
-			<otherwise>
-				and ur.role_id > 0
-			</otherwise>
-		</choose>
-		<choose>
-			<when test="sidx != null and sidx.trim() != ''">
-				order by ${sidx} ${order}
-			</when>
-			<otherwise>
-				order by user_id desc
-			</otherwise>
-		</choose>
-		<if test="offset != null and limit != null">
-			limit #{offset}, #{limit}
-		</if>
-	</select>
-
-	<select id="queryApplyAnchorList" resultType="com.hooview.api.dto.ApplyAnchorDTO">
-		SELECT user_id,username,mobile phone,DATE_FORMAT(anchor_time,'%Y-%m-%d %H:%i:%S') as create_time,
-		CASE WHEN anchor_audit=1 THEN '待审核' WHEN anchor_audit=2 THEN '审核通过' ELSE '审核不通过' END  AS anchor_audit
-		FROM sys_user WHERE anchor_audit = 1
-		<choose>
-			<when test="sidx != null and sidx.trim() != ''">
-				order by ${sidx} ${order}
-			</when>
-			<otherwise>
-				order by user_id desc
-			</otherwise>
-		</choose>
-		<if test="offset != null and limit != null">
-			limit #{offset}, #{limit}
-		</if>
-	</select>
 
 	<select id="queryApplyAnchorTotal" resultType="int">
 		select count(*) from sys_user WHERE anchor_audit = 1
@@ -177,24 +123,12 @@
 		select lur.role_id from sys_user lu LEFT JOIN sys_user_role lur  ON lur.user_id=lu.user_id where lu.user_id = #{userId}
 	</select>
 
-	<select id="queryAnchorList" resultType="com.hooview.api.dto.AnchorDTO">
-		SELECT user_id,username,mobile,sex,region FROM sys_user where anchor=1
-		<if test="username != null and username.trim() != ''">
-			AND username like CONCAT('%',#{username},'%')
-		</if>
-		ORDER BY create_time
-		limit 50
-	</select>
 
 	<!-- 查询用户的所有菜单ID -->
 	<select id="queryAllMenuId" resultType="long">
 		select distinct rm.menu_id from sys_user_role ur
 		LEFT JOIN sys_role_menu rm on ur.role_id = rm.role_id
 		where ur.user_id = #{userId}
-	</select>
-
-	<select id="queryByYiId" resultType="com.hooview.api.dto.UserDTO">
-		select user_id,mobile from sys_user where yi_id = #{yiId}
 	</select>
 
 	<insert id="save" parameterType="com.hooview.entity.SysUserEntity" useGeneratedKeys="true" keyProperty="userId">
@@ -263,12 +197,6 @@
 			<if test="yiId != null">`yi_id` = #{yiId}, </if>
 			<if test="agencyId != null">`agency_id` = #{agencyId} </if>
 		</set>
-		where user_id = #{userId}
-	</update>
-
-	<update id="applyAnchor" parameterType="com.hooview.api.dto.ApplyAnchorDTO">
-		update sys_user
-		SET anchor_audit = 1,username = #{username}
 		where user_id = #{userId}
 	</update>
 

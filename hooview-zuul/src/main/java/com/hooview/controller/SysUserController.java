@@ -1,22 +1,13 @@
 package com.hooview.controller;
 
-import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.JSONArray;
-import com.alibaba.fastjson.JSONObject;
 import com.hooview.api.dto.*;
-import com.hooview.api.entity.AgencyEntity;
-import com.hooview.api.entity.UuidEntity;
-import com.hooview.api.service.AgencyService;
-import com.hooview.api.service.UuidService;
 import com.hooview.common.annotation.SysLog;
-import com.hooview.common.utils.Constant;
 import com.hooview.common.utils.PageUtils;
 import com.hooview.common.utils.Query;
 import com.hooview.common.utils.R;
 import com.hooview.common.validator.Assert;
 import com.hooview.common.validator.ValidatorUtils;
 import com.hooview.common.validator.group.AddGroup;
-import com.hooview.common.validator.group.UpdateGroup;
 import com.hooview.easemob.service.impl.EasemobIMUsers;
 import com.hooview.entity.SysUserEntity;
 import com.hooview.service.SysUserRoleService;

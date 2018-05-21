@@ -1,9 +1,5 @@
 package com.hooview.service;
 
-import com.hooview.api.dto.AnchorDTO;
-import com.hooview.api.dto.AnchorUserDTO;
-import com.hooview.api.dto.ApplyAnchorDTO;
-import com.hooview.api.dto.UserDTO;
 import com.hooview.entity.SysUserEntity;
 import com.hooview.service.impl.SysUserServiceBack;
 import org.springframework.cloud.netflix.feign.FeignClient;

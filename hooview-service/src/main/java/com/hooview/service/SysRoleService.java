@@ -1,6 +1,5 @@
 package com.hooview.service;
 
-import com.hooview.api.dto.SelectRoleDTO;
 import com.hooview.entity.SysRoleEntity;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -38,9 +37,4 @@ public interface SysRoleService {
 	@RequestMapping(value="/role/deleteBatch",method = RequestMethod.POST)
 	void deleteBatch(@RequestBody Long[] roleIds);
 
-	/**
-	 * 查询用户创建的角色ID列表
-	 */
-	@RequestMapping(value="/role/queryRoleIdList",method = RequestMethod.GET)
-	List<SelectRoleDTO> queryRoleIdList();
 }

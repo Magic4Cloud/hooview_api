@@ -1,16 +1,4 @@
-#环信配置
-easemob:
-  org_name: 1150160929178497
-  app_name: hooview
-  grant_type: client_credentials
-  client_id: YXA6XHQ5wIYIEeaB0U1KTfoEZA
-  client_sectet: YXA6UzcJUSeKQi6oBubdyrod-l_XdHc
 
-#云片配置
-yunpian:
-  apikey: 50eb860aff6fd1ad0e6b2294c66a1282
-  login_tpl_id: 2156926
-  updatepw_tpl_id: 2156928
 
 #阿里云OSS
 aliyunoss:
@@ -20,6 +8,9 @@ aliyunoss:
   bucketNameHeader: hooviewheader
   bucketNameBanner: hooviewbanner
   bucketLaunchlive: hooviewlaunchlive
+#短信
+
+#微信
 
 #redis
 redis:

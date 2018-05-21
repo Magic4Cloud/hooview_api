@@ -1,9 +1,5 @@
 package com.hooview.dao;
 
-import com.hooview.api.dto.AnchorDTO;
-import com.hooview.api.dto.AnchorUserDTO;
-import com.hooview.api.dto.ApplyAnchorDTO;
-import com.hooview.api.dto.UserDTO;
 import com.hooview.entity.SysUserEntity;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
@@ -44,12 +40,6 @@ public interface SysUserDao extends BaseDao<SysUserEntity> {
      */
     int updatePassword(Map<String, Object> map);
 
-    /**
-     * 申请主播
-     */
-    void applyAnchor(ApplyAnchorDTO user);
-
-    List<ApplyAnchorDTO> queryApplyAnchorList(Map<String, Object> map);
 
     int queryApplyAnchorTotal(Map<String, Object> map);
 
@@ -63,15 +53,12 @@ public interface SysUserDao extends BaseDao<SysUserEntity> {
      */
     void addFans(Map<String, Object> map);
 
-    List<AnchorUserDTO> queryAnchorUser(Map<String, Object> map);
     /**
      * 审核主播申请
      */
     void auditApplyAnchor(SysUserEntity user);
 
-    List<AnchorDTO> queryAnchorList(@Param("username") String username);
 
-    UserDTO queryByYiId(@Param("yiId") String yiId);
 
     Long queryAgencyId(Long userId);
 }

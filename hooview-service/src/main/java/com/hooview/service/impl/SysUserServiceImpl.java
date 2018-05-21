@@ -1,11 +1,5 @@
 package com.hooview.service.impl;
 
-import com.hooview.api.dao.LiveTypeUserDao;
-import com.hooview.api.dto.AnchorDTO;
-import com.hooview.api.dto.AnchorUserDTO;
-import com.hooview.api.dto.ApplyAnchorDTO;
-import com.hooview.api.dto.UserDTO;
-import com.hooview.api.entity.LiveTypeUserEntity;
 import com.hooview.dao.SysUserDao;
 import com.hooview.entity.SysUserEntity;
 import com.hooview.service.SysRoleService;
@@ -31,8 +25,6 @@ public class SysUserServiceImpl implements SysUserService {
 	private SysUserRoleService sysUserRoleService;
 	@Autowired
 	private SysRoleService sysRoleService;
-	@Autowired
-	private LiveTypeUserDao liveTypeUserDao;
 
 	@Override
 	public List<String> queryAllPerms(Long userId) {
@@ -51,27 +43,12 @@ public class SysUserServiceImpl implements SysUserService {
 		return sysUserDao.queryObject(userId);
 	}
 
-	@Override
-	public List<AnchorUserDTO> queryList(@RequestParam Map<String, Object> map){
-		Query query = new Query(map);
-		return sysUserDao.queryAnchorUser(query);
-	}
 
 	@Override
 	public int queryTotal(@RequestParam Map<String, Object> map) {
 		return sysUserDao.queryTotal(map);
 	}
 
-	@Override
-	public void applyAnchor(@RequestBody ApplyAnchorDTO user) {
-		sysUserDao.applyAnchor(user);
-	}
-
-	@Override
-	public List<ApplyAnchorDTO> queryApplyAnchorList(@RequestParam Map<String, Object> map) {
-		Query query = new Query(map);
-		return sysUserDao.queryApplyAnchorList(query);
-	}
 
 	@Override
 	public int queryApplyAnchorTotal(@RequestParam Map<String, Object> map) {
@@ -88,12 +65,6 @@ public class SysUserServiceImpl implements SysUserService {
 	public void save(@RequestBody SysUserEntity user) {
 
 		sysUserDao.save(user);
-		if(user.getLiveTypeId() != null){
-			LiveTypeUserEntity liveTypeUserEntity = new LiveTypeUserEntity();
-			liveTypeUserEntity.setUserid(user.getUserId());
-			liveTypeUserEntity.setLiveTypeId(user.getLiveTypeId());
-			liveTypeUserDao.save(liveTypeUserEntity);
-		}
 
 
 		//检查角色是否越权
@@ -113,12 +84,6 @@ public class SysUserServiceImpl implements SysUserService {
 			user.setHeadUrl(url);
 		}
 		sysUserDao.update(user);
-		if(user.getLiveTypeId() != null){
-			LiveTypeUserEntity liveTypeUserEntity = new LiveTypeUserEntity();
-			liveTypeUserEntity.setUserid(user.getUserId());
-			liveTypeUserEntity.setLiveTypeId(user.getLiveTypeId());
-			liveTypeUserDao.save(liveTypeUserEntity);
-		}
 
 
 		//检查角色是否越权
@@ -135,7 +100,6 @@ public class SysUserServiceImpl implements SysUserService {
 	@Transactional
 	public void deleteBatch(@RequestBody Long[] userId) {
 		sysUserDao.deleteBatch(userId);
-		liveTypeUserDao.deleteBatch(userId);
 	}
 
 	@Override
@@ -151,14 +115,6 @@ public class SysUserServiceImpl implements SysUserService {
 		return sysUserDao.queryByMobile(mobile);
 	}
 
-	@Override
-	public List<AnchorDTO> queryAnchorList(String username) {
-		return sysUserDao.queryAnchorList(username);
-	}
-
-	public UserDTO queryByYiId(String yiId) {
-		return sysUserDao.queryByYiId(yiId);
-	}
 
 	@Override
 	public Long queryAgencyId(Long userId) {

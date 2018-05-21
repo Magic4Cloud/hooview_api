@@ -1,6 +1,5 @@
 package com.hooview.service;
 
-import com.hooview.api.dto.SelectRoleDTO;
 import com.hooview.entity.SysRoleEntity;
 import com.hooview.service.impl.SysRoleServiceBack;
 import org.springframework.cloud.netflix.feign.FeignClient;

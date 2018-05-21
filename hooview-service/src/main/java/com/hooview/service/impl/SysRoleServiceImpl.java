@@ -1,7 +1,6 @@
 package com.hooview.service.impl;
 
 import com.hooview.Exception.RRException;
-import com.hooview.api.dto.SelectRoleDTO;
 import com.hooview.dao.SysRoleDao;
 import com.hooview.entity.SysRoleEntity;
 import com.hooview.oauth2.Constant;
@@ -77,10 +76,6 @@ public class SysRoleServiceImpl implements SysRoleService {
 		sysRoleDao.deleteBatch(roleIds);
 	}
 
-	@Override
-	public List<SelectRoleDTO> queryRoleIdList() {
-		return sysRoleDao.queryRoleIdList();
-	}
 
 	/**
 	 * 检查权限是否越权

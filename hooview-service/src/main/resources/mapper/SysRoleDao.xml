@@ -91,8 +91,4 @@
 		</foreach>
 	</delete>
 	
-	<!-- 查询用户创建的角色ID列表 -->
-	<select id="queryRoleIdList" resultType="com.hooview.api.dto.SelectRoleDTO">
-		select role_id,role_name from sys_role ORDER BY role_id
-	</select> 
 </mapper>
